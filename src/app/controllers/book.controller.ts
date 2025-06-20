@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import { Book } from '../models/book.model';
-// import { sendResponse } from '../../utils/sendResponse';
 
 export const bookRoutes = express.Router();
 
@@ -52,61 +51,45 @@ bookRoutes.get('/books', async (req: Request, res: Response) => {
     }
 });
 
+// 📖 Get book by ID without tryCatch method
+// bookRoutes.get('/books/:bookId', async (req: Request, res: Response) => {
+//     const bookId = req.params.bookId;
+//     const book = await Book.findOne({ _id: bookId });
+//     res.status(201).json({
+//         success: true,
+//         message: 'Book retrieved successfully',
+//         book
+//     });
+// });
 
+// 📖 Get book by ID
+bookRoutes.get('/books/:bookId', async (req: Request, res: Response) => {
+    const bookId = req.params.bookId;
 
-// // 📚 Get all books (with filtering, sorting, and limiting)
-// export const getAllBooks = async (req: Request, res: Response) => {
-//     try {
-//         const { filter, sortBy = 'createdAt', sort = 'desc', limit = '10' } = req.query;
+    try {
+        const book = await Book.findOne({ _id: bookId });
+        
+        // if (!book) {
+        //     return res.status(404).json({
+        //         success: false,
+        //         message: 'Book not found'
+        //     });
+        // }
 
-//         const query: any = {};
-//         if (filter) query.genre = filter;
+        res.status(200).json({
+            success: true,
+            message: 'Book retrieved successfully',
+            book
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve book',
+            error: (error as Error).message
+        });
+    }
+});
 
-//         const books = await Book.find(query)
-//             .sort({ [sortBy as string]: sort === 'asc' ? 1 : -1 })
-//             .limit(parseInt(limit as string));
-
-//         sendResponse(res, {
-//             success: true,
-//             message: 'Books retrieved successfully',
-//             data: books
-//         });
-//     } catch (error) {
-//         sendResponse(res, {
-//             success: false,
-//             message: 'Failed to retrieve books',
-//             error
-//         });
-//     }
-// };
-
-// // 📖 Get book by ID
-// export const getSingleBook = async (req: Request, res: Response) => {
-//     try {
-//         const { bookId } = req.params;
-//         const book = await Book.findById(bookId);
-
-//         if (!book) {
-//             return sendResponse(res, {
-//                 success: false,
-//                 message: 'Book not found',
-//                 error: { message: 'Invalid book ID' }
-//             });
-//         }
-
-//         sendResponse(res, {
-//             success: true,
-//             message: 'Book retrieved successfully',
-//             data: book
-//         });
-//     } catch (error) {
-//         sendResponse(res, {
-//             success: false,
-//             message: 'Failed to retrieve book',
-//             error
-//         });
-//     }
-// };
 
 // // ✏️ Update book
 // export const updateBook = async (req: Request, res: Response) => {
