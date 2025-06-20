@@ -23,7 +23,34 @@ bookRoutes.post('/books', async (req: Request, res: Response) => {
     }
 });
 
+// 📚 Get all books (with filtering, sorting, and limiting)
+bookRoutes.get('/books', async (req: Request, res: Response) => {
+    try {
+        const { filter, sortBy = 'createdAt', sort = 'asc', limit = '10' } = req.query;
 
+        const query: any = {};
+        if (filter) {
+            query.genre = filter;
+        }
+
+        const sortOrder = sort === 'desc' ? -1 : 1;
+        const books = await Book.find(query)
+            .sort({ [sortBy as string]: sortOrder })
+            .limit(parseInt(limit as string, 10));
+
+        res.status(200).json({
+            success: true,
+            message: 'Books retrieved successfully',
+            data: books
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve books',
+            error
+        });
+    }
+});
 
 
 
