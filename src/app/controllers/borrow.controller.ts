@@ -57,7 +57,7 @@ borrowRoutes.get('/borrow', async (req: Request, res: Response) => {
         res.status(500).json({
             success: false,
             message: 'Failed to fetch summary',
-            error: error.message
+            error: (error instanceof Error ? error.message : 'Unknown error')
         });
     }
 });

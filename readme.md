@@ -2,10 +2,10 @@
 A Library Management System built with Express, TypeScript, and MongoDB, enabling book creation, borrowing, filtering, and reporting.
 
 ## 🚀 Live URL
-🔗 Your deployment link here
+[🔗](https://library-management-api-a3.vercel.app/)
 
 ### 📺 Video Walkthrough
-#### 🎥 Your video link here
+ [🎥]()
 
 ## 📦 Features
 -   ✅ Book CRUD operations with schema validation
@@ -89,7 +89,7 @@ GET /api/books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5
 ## What to Submit
 
 -   [Public Github Repo Link ] (https://github.com/DeveloperMonirBD/Library_Management_API_A3)
--   [Live Deployment Link] ()
+-   [Live Deployment Link] (https://library-management-api-a3.vercel.app/)
 -   [Video Explanation (Public Link)] ()
 
 ## 🙌 Author
