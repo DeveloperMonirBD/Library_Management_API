@@ -28,10 +28,29 @@ exports.bookRoutes.post('/books', (req, res) => __awaiter(void 0, void 0, void 0
         });
     }
     catch (error) {
+        // Duplicate ISBN (MongoDB unique index violation)
+        if (error.code === 11000) {
+            res.status(409).json({
+                success: false,
+                message: 'ISBN must be unique',
+                error: error.keyValue
+            });
+            return;
+        }
+        // Mongoose Validation Error
+        if (error.name === 'ValidationError') {
+            res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                error: error.errors
+            });
+            return;
+        }
+        // Fallback for other unhandled errors
         res.status(500).json({
             success: false,
             message: 'Failed to create book',
-            error
+            error: error.message || error
         });
     }
 }));
@@ -47,6 +66,16 @@ exports.bookRoutes.get('/books', (req, res) => __awaiter(void 0, void 0, void 0,
         const books = yield book_model_1.Book.find(query)
             .sort({ [sortBy]: sortOrder })
             .limit(parseInt(limit, 10));
+        if (books.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'No books found matching the query',
+                error: {
+                    filter
+                }
+            });
+            return;
+        }
         res.status(200).json({
             success: true,
             message: 'Books retrieved successfully',
@@ -76,12 +105,13 @@ exports.bookRoutes.get('/books/:bookId', (req, res) => __awaiter(void 0, void 0,
     const bookId = req.params.bookId;
     try {
         const book = yield book_model_1.Book.findOne({ _id: bookId });
-        // if (!book) {
-        //     return res.status(404).json({
-        //         success: false,
-        //         message: 'Book not found'
-        //     });
-        // }
+        if (!book) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found'
+            });
+            return;
+        }
         res.status(200).json({
             success: true,
             message: 'Book retrieved successfully',
@@ -102,6 +132,16 @@ exports.bookRoutes.put('/books/:bookId', (req, res) => __awaiter(void 0, void 0,
         const { bookId } = req.params;
         const updateData = req.body;
         const updatedBook = yield book_model_1.Book.findByIdAndUpdate(bookId, updateData, { new: true, runValidators: true });
+        if (!updatedBook) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+                error: {
+                    bookId
+                }
+            });
+            return;
+        }
         res.status(200).json({
             success: true,
             message: 'Book updated successfully',
@@ -109,10 +149,22 @@ exports.bookRoutes.put('/books/:bookId', (req, res) => __awaiter(void 0, void 0,
         });
     }
     catch (error) {
+        // Optional: CastError check for invalid ObjectId
+        if (error.name === 'CastError') {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid Book ID',
+                error: {
+                    path: error.path,
+                    value: error.value
+                }
+            });
+            return;
+        }
         res.status(500).json({
             success: false,
             message: 'Failed to update book',
-            error
+            error: error.message || error
         });
     }
 }));
@@ -121,6 +173,16 @@ exports.bookRoutes.delete('/books/:bookId', (req, res) => __awaiter(void 0, void
     try {
         const bookId = req.params.bookId;
         const deletedBook = yield book_model_1.Book.findByIdAndDelete(bookId);
+        if (!deletedBook) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+                error: {
+                    bookId
+                }
+            });
+            return;
+        }
         res.status(200).json({
             success: true,
             message: 'Book deleted successfully',
@@ -128,10 +190,22 @@ exports.bookRoutes.delete('/books/:bookId', (req, res) => __awaiter(void 0, void
         });
     }
     catch (error) {
+        // Optional: handle invalid ObjectId
+        if (error.name === 'CastError') {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid Book ID',
+                error: {
+                    path: error.path,
+                    value: error.value
+                }
+            });
+            return;
+        }
         res.status(500).json({
             success: false,
             message: 'Failed to delete book',
-            error
+            error: error.message || error
         });
     }
 }));

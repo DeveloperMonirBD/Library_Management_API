@@ -13,24 +13,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.borrowRoutes = void 0;
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const borrow_model_1 = __importDefault(require("../models/borrow.model"));
 const book_model_1 = require("../models/book.model");
-exports.borrowRoutes = express_1.default.Router();
+const borrowRoutes = (0, express_1.Router)();
+exports.borrowRoutes = borrowRoutes;
 // Borrow book
-exports.borrowRoutes.post('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+borrowRoutes.post('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { book: bookId, quantity, dueDate } = req.body;
         const book = yield book_model_1.Book.decrementCopies(bookId, quantity);
-        const borrow = yield borrow_model_1.default.create({ book: book._id, quantity, dueDate });
-        res.status(201).json({ success: true, message: 'Book borrowed successfully', data: borrow });
+        const borrow = yield borrow_model_1.default.create({
+            book: book._id,
+            quantity,
+            dueDate
+        });
+        res.status(201).json({
+            success: true,
+            message: 'Book borrowed successfully',
+            data: borrow
+        });
     }
     catch (error) {
-        res.status(400).json({ success: false, message: error.message || 'Failed to borrow book' });
+        const msg = error.message || 'Failed to borrow book';
+        const { book: bookId } = req.body;
+        if (msg === 'Book not found') {
+            res.status(404).json({
+                success: false,
+                message: msg,
+                error: { bookId }
+            });
+            return;
+        }
+        if (msg === 'Not enough copies available') {
+            res.status(400).json({
+                success: false,
+                message: msg
+            });
+            return;
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+            error: msg
+        });
     }
 }));
 // Borrowed books summary
-exports.borrowRoutes.get('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+borrowRoutes.get('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const summary = yield borrow_model_1.default.aggregate([
             {
@@ -59,6 +89,14 @@ exports.borrowRoutes.get('/borrow', (req, res) => __awaiter(void 0, void 0, void
                 }
             }
         ]);
+        if (summary.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'No borrowed book records found',
+                error: null
+            });
+            return;
+        }
         res.status(200).json({
             success: true,
             message: 'Borrowed books summary retrieved successfully',
@@ -69,7 +107,7 @@ exports.borrowRoutes.get('/borrow', (req, res) => __awaiter(void 0, void 0, void
         res.status(500).json({
             success: false,
             message: 'Failed to fetch summary',
-            error: (error instanceof Error ? error.message : 'Unknown error')
+            error: error instanceof Error ? error.message : 'Unknown error'
         });
     }
 }));
