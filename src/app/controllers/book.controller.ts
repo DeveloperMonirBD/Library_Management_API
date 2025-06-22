@@ -13,17 +13,38 @@ bookRoutes.post('/books', async (req: Request, res: Response) => {
             message: 'Book created successfully',
             data: book
         });
-    } catch (error) {
+    } catch (error: any) {
+        // Duplicate ISBN (MongoDB unique index violation)
+        if (error.code === 11000) {
+            res.status(409).json({
+                success: false,
+                message: 'ISBN must be unique',
+                error: error.keyValue
+            });
+            return;
+        }
+
+        // Mongoose Validation Error
+        if (error.name === 'ValidationError') {
+            res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                error: error.errors
+            });
+            return;
+        }
+
+        // Fallback for other unhandled errors
         res.status(500).json({
             success: false,
             message: 'Failed to create book',
-            error
+            error: error.message || error
         });
     }
 });
 
 // 📚 Get all books (with filtering, sorting, and limiting)
-bookRoutes.get('/books', async (req: Request, res: Response) => {
+bookRoutes.get('/books', async (req: Request, res: Response): Promise<void> => {
     try {
         const { filter, sortBy = 'createdAt', sort = 'asc', limit = '10' } = req.query;
 
@@ -36,6 +57,17 @@ bookRoutes.get('/books', async (req: Request, res: Response) => {
         const books = await Book.find(query)
             .sort({ [sortBy as string]: sortOrder })
             .limit(parseInt(limit as string, 10));
+        
+        if (books.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'No books found matching the query',
+                error: {
+                    filter
+                }
+            });
+            return;
+        }
 
         res.status(200).json({
             success: true,
@@ -63,18 +95,19 @@ bookRoutes.get('/books', async (req: Request, res: Response) => {
 // });
 
 // 📖 Get book by ID
-bookRoutes.get('/books/:bookId', async (req: Request, res: Response) => {
+bookRoutes.get('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
     const bookId = req.params.bookId;
 
     try {
         const book = await Book.findOne({ _id: bookId });
 
-        // if (!book) {
-        //     return res.status(404).json({
-        //         success: false,
-        //         message: 'Book not found'
-        //     });
-        // }
+        if (!book) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found'
+            });
+            return;
+        }
 
         res.status(200).json({
             success: true,
@@ -91,42 +124,93 @@ bookRoutes.get('/books/:bookId', async (req: Request, res: Response) => {
 });
 
 // ✏️ Update book
-bookRoutes.put('/books/:bookId', async (req: Request, res: Response) => {
+bookRoutes.put('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { bookId } = req.params;
         const updateData = req.body;
+
         const updatedBook = await Book.findByIdAndUpdate(bookId, updateData, { new: true, runValidators: true });
+
+        if (!updatedBook) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+                error: {
+                    bookId
+                }
+            });
+            return;
+        }
 
         res.status(200).json({
             success: true,
             message: 'Book updated successfully',
             data: updatedBook
         });
-    } catch (error) {
+    } catch (error: any) {
+        // Optional: CastError check for invalid ObjectId
+        if (error.name === 'CastError') {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid Book ID',
+                error: {
+                    path: error.path,
+                    value: error.value
+                }
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to update book',
-            error
+            error: error.message || error
         });
     }
 });
+  
 
 // 🗑️ Delete book
-bookRoutes.delete('/books/:bookId', async (req: Request, res: Response) => {
+bookRoutes.delete('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
     try {
         const bookId = req.params.bookId;
         const deletedBook = await Book.findByIdAndDelete(bookId);
+
+        if (!deletedBook) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+                error: {
+                    bookId
+                }
+            });
+            return;
+        }
 
         res.status(200).json({
             success: true,
             message: 'Book deleted successfully',
             data: null
         });
-    } catch (error) {
+    } catch (error: any) {
+        // Optional: handle invalid ObjectId
+        if (error.name === 'CastError') {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid Book ID',
+                error: {
+                    path: error.path,
+                    value: error.value
+                }
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to delete book',
-            error
+            error: error.message || error
         });
     }
 });
+  
