@@ -86,7 +86,8 @@ bookSchema.pre(/^find/, function (next) {
   // ✅ Post-DELETE
   bookSchema.post('findOneAndDelete', function (doc) {
     if (doc) {
-      console.log(`🪵 Deleted: "${doc.title}" (ID: ${doc._id})`);
+        console.log(`🪵 Deleted: "${doc.title}" (ID: ${doc._id})`);
+        Book.deleteMany({Id: doc._id})
     }
   }); 
 

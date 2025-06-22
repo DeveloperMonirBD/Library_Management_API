@@ -174,7 +174,8 @@ bookRoutes.put('/books/:bookId', async (req: Request, res: Response): Promise<vo
 bookRoutes.delete('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
     try {
         const bookId = req.params.bookId;
-        const deletedBook = await Book.findByIdAndDelete(bookId);
+        // const deletedBook = await Book.findByIdAndDelete(bookId);
+        const deletedBook = await Book.findOneAndDelete({ _id: bookId });
 
         if (!deletedBook) {
             res.status(404).json({
