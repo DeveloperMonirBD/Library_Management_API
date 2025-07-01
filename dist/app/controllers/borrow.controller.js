@@ -19,9 +19,11 @@ const book_model_1 = require("../models/book.model");
 const borrowRoutes = (0, express_1.Router)();
 exports.borrowRoutes = borrowRoutes;
 // Borrow book
-borrowRoutes.post('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+borrowRoutes.post('/borrow/:bookId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { book: bookId, quantity, dueDate } = req.body;
+        // const { book: bookId, quantity, dueDate } = req.body;
+        const { bookId } = req.params; // now from URL
+        const { quantity, dueDate } = req.body;
         const book = yield book_model_1.Book.decrementCopies(bookId, quantity);
         const borrow = yield borrow_model_1.default.create({
             book: book._id,
@@ -60,7 +62,7 @@ borrowRoutes.post('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 }));
 // Borrowed books summary
-borrowRoutes.get('/borrow', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+borrowRoutes.get('/borrow-summary', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const summary = yield borrow_model_1.default.aggregate([
             {

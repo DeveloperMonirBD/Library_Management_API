@@ -16,8 +16,9 @@ borrowRoutes.post('/borrow/:bookId', async (req: Request, res: Response): Promis
 
         const borrow = await Borrow.create({
             book: book._id,
+            image: book.image, // Assuming book has an image field
             quantity,
-            dueDate
+            dueDate,
         });
 
         res.status(201).json({

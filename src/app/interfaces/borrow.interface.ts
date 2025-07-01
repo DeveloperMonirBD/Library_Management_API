@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 
 export interface IBorrow {
     quantity: number;
+    image: string;
     dueDate: Date;
     createdAt?: Date;
     updatedAt?: Date;

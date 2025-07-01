@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Book } from '../models/book.model';
+import Borrow  from '../models/borrow.model';
 
 export const bookRoutes = express.Router();
 
@@ -84,8 +85,8 @@ bookRoutes.get('/books', async (req: Request, res: Response): Promise<void> => {
 });
 
 // 📖 Get book by ID without tryCatch method
-// bookRoutes.get('/books/:bookId', async (req: Request, res: Response) => {
-//     const bookId = req.params.bookId;
+// bookRoutes.get('/books/:id', async (req: Request, res: Response) => {
+//     const bookId = req.params.id;
 //     const book = await Book.findOne({ _id: bookId });
 //     res.status(201).json({
 //         success: true,
@@ -126,7 +127,7 @@ bookRoutes.get('/books/:id', async (req: Request, res: Response): Promise<void> 
 // ✏️ Update book
 bookRoutes.put('/edit-book/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-        const bookId  = req.params.id;
+        const bookId = req.params.id;
         const updateData = req.body;
 
         const updatedBook = await Book.findByIdAndUpdate(bookId, updateData, { new: true, runValidators: true });
@@ -176,7 +177,12 @@ bookRoutes.delete('/books/:id', async (req: Request, res: Response): Promise<voi
         // const deletedBook = await Book.findByIdAndDelete(bookId);
         const deletedBook = await Book.findOneAndDelete({ _id: bookId });
 
-        if (!deletedBook) {
+        // Delete all borrows associated with this book
+        const deletedBorrow = await Borrow.deleteMany({ book: bookId });
+     
+        // If no book was found or deleted, return 404
+        // If no borrows were deleted, return 404
+        if (!deletedBook && deletedBorrow.deletedCount === 0) {
             res.status(404).json({
                 success: false,
                 message: 'Book not found',
@@ -213,4 +219,3 @@ bookRoutes.delete('/books/:id', async (req: Request, res: Response): Promise<voi
         });
     }
 });
-  
