@@ -4,7 +4,7 @@ import { Book } from '../models/book.model';
 export const bookRoutes = express.Router();
 
 // 🆕 Create a new book
-bookRoutes.post('/books', async (req: Request, res: Response) => {
+bookRoutes.post('/create-book', async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const book = await Book.create(body);
@@ -57,7 +57,7 @@ bookRoutes.get('/books', async (req: Request, res: Response): Promise<void> => {
         const books = await Book.find(query)
             .sort({ [sortBy as string]: sortOrder })
             .limit(parseInt(limit as string, 10));
-        
+
         if (books.length === 0) {
             res.status(404).json({
                 success: false,
@@ -95,8 +95,8 @@ bookRoutes.get('/books', async (req: Request, res: Response): Promise<void> => {
 // });
 
 // 📖 Get book by ID
-bookRoutes.get('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
-    const bookId = req.params.bookId;
+bookRoutes.get('/books/:id', async (req: Request, res: Response): Promise<void> => {
+    const bookId = req.params.id;
 
     try {
         const book = await Book.findOne({ _id: bookId });
@@ -124,9 +124,9 @@ bookRoutes.get('/books/:bookId', async (req: Request, res: Response): Promise<vo
 });
 
 // ✏️ Update book
-bookRoutes.put('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
+bookRoutes.put('/edit-book/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { bookId } = req.params;
+        const bookId  = req.params.id;
         const updateData = req.body;
 
         const updatedBook = await Book.findByIdAndUpdate(bookId, updateData, { new: true, runValidators: true });
@@ -168,12 +168,11 @@ bookRoutes.put('/books/:bookId', async (req: Request, res: Response): Promise<vo
         });
     }
 });
-  
 
 // 🗑️ Delete book
-bookRoutes.delete('/books/:bookId', async (req: Request, res: Response): Promise<void> => {
+bookRoutes.delete('/books/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-        const bookId = req.params.bookId;
+        const bookId = req.params.id;
         // const deletedBook = await Book.findByIdAndDelete(bookId);
         const deletedBook = await Book.findOneAndDelete({ _id: bookId });
 

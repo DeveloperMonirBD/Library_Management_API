@@ -2,10 +2,7 @@
 A Library Management System built with Express, TypeScript, and MongoDB, enabling book creation, borrowing, filtering, and reporting.
 
 ## 🚀 Live URL
-[🔗](https://library-management-api-a3.vercel.app/)
-
-### 📺 Video Walkthrough
- [🎥]()
+[🔗](https://library-management-api-a4.vercel.app/)
 
 ## 📦 Features
 -   ✅ Book CRUD operations with schema validation
@@ -44,22 +41,22 @@ npm run dev
 ### 📘 Books
 | Method	 | Endpoint	| Description |
 | ----------- | -------- | ----------- |
-| POST	  | /api/books	 | Create a book |
-| GET	  | /api/books	 | Get all books (filter/sort) |
-| GET	  | /api/books/:bookId	| Get book by ID |
-| PUT	  | /api/books/:bookId	| Update book |
-| DELETE  | /api/books/:bookId	| Delete book |
+| POST	  | /create-book	 | Create a book |
+| GET	  | /books	 | Get all books (filter/sort) |
+| GET	  | /books/:id	| Get book by ID |
+| PUT	  | /edit-book/:id	| Update book |
+| DELETE  | /books/:id	| Delete book |
 
 ## Filtering Example
 ```Http
-GET /api/books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5
+GET /books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5
 ```
 
 ## 📙 Borrow
 | Method	 | Endpoint	| Description |
 | ----------- | -------- | ----------- |
-| POST	  | /api/borrow	 | Borrow a book (quantity check + update copies) |
-| GET	  | /api/borrow	 | Borrowed books summary (aggregation) |
+| POST	  | /borrow/:bookId	 | Borrow a book (quantity check + update copies) |
+| GET	  | /borrow-summary | Borrowed books summary (aggregation) |
 
 ## 🧩 Business Logic Highlights
 
@@ -88,8 +85,8 @@ GET /api/books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5
 
 ## What to Submit
 
--   [Public Github Repo Link ] (https://github.com/DeveloperMonirBD/Library_Management_API_A3)
--   [Live Deployment Link] (https://library-management-api-a3.vercel.app/)
+-   [Public Github Repo Link ] (https://github.com/DeveloperMonirBD/Library_Management_API)
+-   [Live Deployment Link] (https://library-management-api-a4.vercel.app/)
 -   [Video Explanation (Public Link)] ()
 
 ## 🙌 Author

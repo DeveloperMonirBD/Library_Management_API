@@ -90,6 +90,7 @@ bookSchema.pre('findOneAndDelete', function (next) {
 bookSchema.post('findOneAndDelete', function (doc) {
     if (doc) {
         console.log(`🪵 Deleted: "${doc.title}" (ID: ${doc._id})`);
+        exports.Book.deleteMany({ Id: doc._id });
     }
 });
 exports.Book = (0, mongoose_1.model)('Book', bookSchema);

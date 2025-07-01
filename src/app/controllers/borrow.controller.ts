@@ -6,9 +6,11 @@ const borrowRoutes = Router();
 export { borrowRoutes };
 
 // Borrow book
-borrowRoutes.post('/borrow', async (req: Request, res: Response): Promise<void> => {
+borrowRoutes.post('/borrow/:bookId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { book: bookId, quantity, dueDate } = req.body;
+        // const { book: bookId, quantity, dueDate } = req.body;
+        const { bookId } = req.params; // now from URL
+        const { quantity, dueDate } = req.body;
 
         const book = await (Book as any).decrementCopies(bookId, quantity);
 
@@ -53,7 +55,7 @@ borrowRoutes.post('/borrow', async (req: Request, res: Response): Promise<void> 
 });
   
 // Borrowed books summary
-borrowRoutes.get('/borrow', async (req: Request, res: Response) : Promise<void> => {
+borrowRoutes.get('/borrow-summary', async (req: Request, res: Response) : Promise<void> => {
     try {
         const summary = await Borrow.aggregate([
             {
