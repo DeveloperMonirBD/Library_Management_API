@@ -1,8 +1,19 @@
 import express, { Application, Request, Response } from 'express';
 import { bookRoutes } from './app/controllers/book.controller';
 import { borrowRoutes } from './app/controllers/borrow.controller';
+import cors from 'cors';
 
 const app: Application = express();
+
+// ✅ Enable CORS
+// app.use(cors());
+app.use(
+    cors({
+        origin: 'http://localhost:5173', // frontend origin
+        credentials: true,
+    })
+);
+
 app.use(express.json());
 
 // Middleware to parse JSON bodies
