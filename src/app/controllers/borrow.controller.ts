@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
-import Borrow  from '../models/borrow.model';
+import { Request, Response, Router } from 'express';
 import { Book } from '../models/book.model';
+import Borrow from '../models/borrow.model';
 
 const borrowRoutes = Router();
 export { borrowRoutes };
@@ -54,9 +54,37 @@ borrowRoutes.post('/borrow/:bookId', async (req: Request, res: Response): Promis
         });
     }
 });
-  
+
+// // 📚 Borrow book another way
+// borrowRoutes.post('/borrow/:bookId', async (req: Request, res: Response) => {
+//     try {
+//         const { bookId } = req.params;
+//         const { quantity, dueDate } = req.body;
+
+//         if (!quantity || !dueDate) {
+//             throw new Error('Missing required fields');
+//         }
+
+//         const book = await Book.findById(bookId);
+//         if (!book) throw new Error('Book not found');
+//         if (book.copies < quantity) throw new Error('Not enough copies available');
+
+//         book.copies -= quantity;
+//         book.available = book.copies > 0;
+//         await book.save();
+
+//         const borrow = await Borrow.create({ book: book._id, quantity, dueDate });
+
+//         res.status(201).json({ success: true, data: borrow });
+//     } catch (error: any) {
+//         console.error('Borrow error:', error.message); // 🔍 log the exact error
+//         res.status(500).json({ success: false, message: error.message });
+//     }
+// });
+
+
 // Borrowed books summary
-borrowRoutes.get('/borrow-summary', async (req: Request, res: Response) : Promise<void> => {
+borrowRoutes.get('/borrow-summary', async (req: Request, res: Response): Promise<void> => {
     try {
         const summary = await Borrow.aggregate([
             {
@@ -108,4 +136,3 @@ borrowRoutes.get('/borrow-summary', async (req: Request, res: Response) : Promis
         });
     }
 });
-  

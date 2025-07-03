@@ -27,8 +27,9 @@ borrowRoutes.post('/borrow/:bookId', (req, res) => __awaiter(void 0, void 0, voi
         const book = yield book_model_1.Book.decrementCopies(bookId, quantity);
         const borrow = yield borrow_model_1.default.create({
             book: book._id,
+            image: book.image, // Assuming book has an image field
             quantity,
-            dueDate
+            dueDate,
         });
         res.status(201).json({
             success: true,

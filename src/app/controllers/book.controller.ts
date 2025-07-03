@@ -57,7 +57,7 @@ bookRoutes.get('/books', async (req: Request, res: Response): Promise<void> => {
         const sortOrder = sort === 'desc' ? -1 : 1;
         const books = await Book.find(query)
             .sort({ [sortBy as string]: sortOrder })
-            .limit(parseInt(limit as string, 10));
+            // .limit(parseInt(limit as string, 10));
 
         if (books.length === 0) {
             res.status(404).json({

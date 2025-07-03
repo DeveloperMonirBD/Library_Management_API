@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookRoutes = void 0;
 const express_1 = __importDefault(require("express"));
 const book_model_1 = require("../models/book.model");
+const borrow_model_1 = __importDefault(require("../models/borrow.model"));
 exports.bookRoutes = express_1.default.Router();
 // 🆕 Create a new book
 exports.bookRoutes.post('/create-book', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -174,7 +175,11 @@ exports.bookRoutes.delete('/books/:id', (req, res) => __awaiter(void 0, void 0, 
         const bookId = req.params.id;
         // const deletedBook = await Book.findByIdAndDelete(bookId);
         const deletedBook = yield book_model_1.Book.findOneAndDelete({ _id: bookId });
-        if (!deletedBook) {
+        // Delete all borrows associated with this book
+        const deletedBorrow = yield borrow_model_1.default.deleteMany({ book: bookId });
+        // If no book was found or deleted, return 404
+        // If no borrows were deleted, return 404
+        if (!deletedBook && deletedBorrow.deletedCount === 0) {
             res.status(404).json({
                 success: false,
                 message: 'Book not found',

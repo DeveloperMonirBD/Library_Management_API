@@ -13,6 +13,7 @@ exports.Book = void 0;
 const mongoose_1 = require("mongoose");
 const bookSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
+    image: { type: String, required: true },
     author: { type: String, required: true },
     genre: {
         type: String,

@@ -4,7 +4,7 @@ import { BookModel, IBook } from '../interfaces/book.interface';
 const bookSchema = new Schema<IBook, BookModel>(
     {
         title: { type: String, required: true },
-        image: { type: String, required: true },
+        image: { type: String },
         author: { type: String, required: true },
         genre: {
             type: String,

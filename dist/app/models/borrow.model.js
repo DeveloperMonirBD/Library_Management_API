@@ -3,12 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const borrowSchema = new mongoose_1.Schema({
     quantity: { type: Number, required: true },
+    image: { type: String },
     dueDate: { type: Date, required: true },
     book: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Book',
         required: true
-    },
+    }
 }, {
     timestamps: true,
     versionKey: false
